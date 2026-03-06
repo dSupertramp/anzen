@@ -12,6 +12,9 @@ _ml_cache = _root / "ml"
 os.environ.setdefault("HF_HOME", str(_ml_cache))
 os.environ.setdefault("TRANSFORMERS_CACHE", str(_ml_cache))
 
+# Lazy-loaded Hugging Face zero-shot classifier (Layer 2)
+_pipeline = None
+
 
 class AttackCategory(StrEnum):
     CLEAN = "clean"

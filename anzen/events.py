@@ -135,6 +135,6 @@ class EventBus:
             )
             with urllib.request.urlopen(req, timeout=5):
                 pass
-        except Exception as exc:
-            import sys
-            print(f"[anzen] failed to push event to {url}: {exc}", file=sys.stderr)
+        except Exception:
+            # Dashboard unreachable (e.g. not running): fail silently
+            pass
