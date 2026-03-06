@@ -1,0 +1,44 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+*.db
+*.db-shm
+*.db-wal
+.github/
+
+# Frontend
+node_modules/
+frontend/dist/
+anzen/server/_static/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# env
+examples/.env
+
+# Ruff
+.ruff_cache/
+
+# PyTest
+.pytest_cache/
+
+# MiniLM model
+ml/
+
+# Local db
+anzen.db

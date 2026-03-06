@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anzen"
+version = "0.1.0"
+description = "Open-source security layer for agentic AI."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.13"
+authors = [
+    { name = "dSupertramp", email = "salvatoredanilopalumbo@gmail.com" },
+]
+keywords = [
+    "security",
+    "ai",
+    "llm",
+    "prompt-injection",
+    "jailbreak",
+    "rag-poisoning",
+    "mcp",
+    "agentic-ai",
+    "guardrails",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+dependencies = [
+    "anthropic>=0.84.0",
+    "cohere>=5.20.7",
+    "google-genai>=1.65.0",
+    "groq>=1.0.0",
+    "mistral>=21.0.0",
+    "openai>=2.24.0",
+    "sentence-transformers>=3.0.0",
+    "torch>=2.10.0",
+    "transformers>=5.2.0",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "sqlalchemy>=2.0",
+    "aiosqlite>=0.20",
+    "pydantic-settings>=2.2",
+    "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "python-dotenv>=1.2.2",
+    "pytest>=8.0.0",
+    "ruff>=0.15.4",
+    "mypy>=1.0",
+]
+langchain = ["langchain>=0.3"]
+llamaindex = ["llama-index>=0.12"]
+
+[project.urls]
+Homepage = "https://github.com/dSupertramp/anzen"
+Repository = "https://github.com/dSupertramp/anzen"
+Issues = "https://github.com/dSupertramp/anzen/issues"
+
+[project.scripts]
+anzen = "anzen.cli:main"
+
+[dependency-groups]
+dev = [
+    "python-dotenv>=1.2.2",
+    "pytest>=8.0.0",
+    "ruff>=0.15.4",
+    "mypy>=1.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["anzen*"]
+
+[tool.setuptools.package-data]
+"anzen.server" = ["_static/**"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
