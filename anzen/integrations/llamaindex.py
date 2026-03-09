@@ -15,7 +15,7 @@ Usage:
     safe_nodes = observer.filter_nodes(nodes, query_str=query)
 """
 
-from typing import Any, Dict, List
+from typing import Any, dict, list
 
 try:
     from llama_index.core.callbacks.schema import CBEventType
@@ -33,8 +33,8 @@ class AnzenObserver:
     Works with QueryEngine, RetrieverQueryEngine, and agent workflows.
     """
 
-    event_starts_to_ignore: List = []
-    event_ends_to_ignore: List = []
+    event_starts_to_ignore: list = []
+    event_ends_to_ignore: list = []
 
     def __init__(
         self,
@@ -57,7 +57,7 @@ class AnzenObserver:
     def on_event_start(
         self,
         event_type,
-        payload: Dict[str, Any] | None = None,
+        payload: dict[str, Any] | None = None,
         event_id: str = "",
         **kwargs,
     ) -> str:
@@ -67,9 +67,7 @@ class AnzenObserver:
         if event_type == CBEventType.LLM:
             messages = payload.get("messages", [])
             for msg in messages:
-                content = getattr(msg, "content", None) or (
-                    msg.get("content") if isinstance(msg, dict) else None
-                )
+                content = getattr(msg, "content", None) or (msg.get("content") if isinstance(msg, dict) else None)
                 if content:
                     safe = self._agent.check_prompt(str(content))
                     if not safe and self.block_on_injection:
@@ -92,7 +90,7 @@ class AnzenObserver:
     def on_event_end(
         self,
         event_type,
-        payload: Dict[str, Any] | None = None,
+        payload: dict[str, Any] | None = None,
         event_id: str = "",
         **kwargs,
     ) -> None:
@@ -104,13 +102,13 @@ class AnzenObserver:
     def end_trace(
         self,
         trace_id: str | None = None,
-        trace_map: Dict[str, List[str]] | None = None,
+        trace_map: dict[str, list[str]] | None = None,
     ) -> None:
         pass
 
     # ─── RAG helper ──────────────────────────────────────────────────────────
 
-    def filter_nodes(self, nodes: List, query_str: str | None = None) -> List:
+    def filter_nodes(self, nodes: list, query_str: str | None = None) -> list:
         """
         Filter LlamaIndex NodeWithScore or TextNode objects through RAGGuard.
 

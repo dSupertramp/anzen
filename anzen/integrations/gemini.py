@@ -1,3 +1,5 @@
+"""Gemini integration"""
+
 from anzen.client import wrap as _wrap
 from anzen.config import AnzenConfig
 from anzen.integrations._base import BaseAdapter, BaseCompletions, messages_to_prompt

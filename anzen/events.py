@@ -1,26 +1,27 @@
 """
-Shared event types emitted by all guards → EventBus → Dashboard
+Shared event types emitted by all guards -> EventBus -> Dashboard
 """
 
 import atexit
+import contextlib
 import json
+import threading
 import time
 import urllib.request
 import uuid
-import threading
-from dataclasses import dataclass, asdict, field
-from enum import Enum
-from typing import Any, Dict
-from queue import Queue, Empty
+from dataclasses import asdict, dataclass, field
+from enum import StrEnum
+from queue import Empty, Queue
+from typing import Any, dict
 
 
-class EventAction(str, Enum):
+class EventAction(StrEnum):
     ALLOW = "allow"
     ALERT = "alert"
     BLOCK = "block"
 
 
-class GuardType(str, Enum):
+class GuardType(StrEnum):
     PROMPT = "prompt"
     RAG = "rag"
     TOOL = "tool"
@@ -37,12 +38,12 @@ class GuardEvent:
 
     # Optional context
     input_text: str | None = None  # prompt / chunk / tool name
-    input_params: Dict | None = None  # tool params
+    input_params: dict | None = None  # tool params
     layer: int = 0
     latency_ms: float = 0.0
     confidence: float = 0.0
     cumulative_risk: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     # Auto-generated
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
@@ -65,9 +66,7 @@ class EventBus:
     Non-blocking — drops events if queue is full rather than slow down the app.
     """
 
-    def __init__(
-        self, monitor_url: str | None = None, api_key: str | None = None
-    ):
+    def __init__(self, monitor_url: str | None = None, api_key: str | None = None):
         self._queue: Queue[GuardEvent] = Queue(maxsize=2000)
         self._callbacks = []
         self._dashboard_url = monitor_url
@@ -78,10 +77,9 @@ class EventBus:
         atexit.register(self.flush)
 
     def emit(self, event: GuardEvent) -> None:
-        try:
+        # Never block the main thread; drop event if queue is full.
+        with contextlib.suppress(Exception):
             self._queue.put_nowait(event)
-        except Exception:
-            pass  # Never block the main thread
 
     def flush(self, timeout: float = 5.0) -> None:
         """Stop worker, wait for in-flight dispatch, then drain remaining events."""
@@ -112,10 +110,8 @@ class EventBus:
     def _dispatch(self, event: GuardEvent):
         # Custom callbacks
         for cb in self._callbacks:
-            try:
+            with contextlib.suppress(Exception):
                 cb(event)
-            except Exception:
-                pass
 
         # Dashboard HTTP push
         if self._dashboard_url:

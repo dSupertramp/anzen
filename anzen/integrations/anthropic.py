@@ -1,4 +1,4 @@
-"""Anthropic integration — wrap an existing Anthropic client."""
+"""Anthropic integration"""
 
 from anzen.client import wrap as _wrap
 from anzen.config import AnzenConfig

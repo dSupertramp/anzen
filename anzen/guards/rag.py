@@ -3,7 +3,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 import numpy as np
-from typing import List, Dict, Any, Union
+from typing import list, dict, Any, Union
 from sentence_transformers import SentenceTransformer
 from anzen.guards.prompt import _layer1 as prompt_layer1
 
@@ -21,10 +21,7 @@ _embedder = None
 def _get_embedder():
     global _embedder
     if _embedder is None:
-        if SentenceTransformer is None:
-            _embedder = "unavailable"
-        else:
-            _embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        _embedder = "unavailable" if SentenceTransformer is None else SentenceTransformer("all-MiniLM-L6-v2")
     return _embedder
 
 
@@ -38,13 +35,13 @@ class ChunkResult:
     injection_score: float = 0.0  # score from prompt injection check
     relevance_score: float = 1.0  # cosine sim to query (higher = more relevant)
     outlier_score: float = 0.0  # how different from other chunks (higher = more anomalous)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class RAGResult:
-    safe_chunks: List[str]
-    chunk_results: List[ChunkResult]
+    safe_chunks: list[str]
+    chunk_results: list[ChunkResult]
     blocked_count: int
     alerted_count: int
     latency_ms: float
@@ -88,7 +85,7 @@ class RAGGuard:
 
     def scan(
         self,
-        chunks: List[Union[str, Dict]],
+        chunks: list[Union[str, dict]],
         query: str | None = None,
     ) -> RAGResult:
         """
@@ -107,7 +104,7 @@ class RAGGuard:
         if self.use_embeddings and texts:
             embeddings, query_embedding = self._embed_batch(texts, query)
 
-        results: List[ChunkResult] = []
+        results: list[ChunkResult] = []
         for i, text in enumerate(texts):
             emb = embeddings[i] if embeddings is not None else None
             q_emb = query_embedding
@@ -124,7 +121,7 @@ class RAGGuard:
             latency_ms=(time.perf_counter() - t0) * 1000,
         )
 
-    def scan_chunk(self, chunk: Union[str, Dict], query: str | None = None) -> ChunkResult:
+    def scan_chunk(self, chunk: Union[str, dict], query: str | None = None) -> ChunkResult:
         """Scan a single chunk."""
         result = self.scan([chunk], query=query)
         return result.chunk_results[0]
@@ -141,7 +138,7 @@ class RAGGuard:
             return chunk.page_content
         return str(chunk)
 
-    def _embed_batch(self, texts: List[str], query: str | None):
+    def _embed_batch(self, texts: list[str], query: str | None):
         embedder = _get_embedder()
         if embedder == "unavailable":
             return None, None
@@ -164,7 +161,7 @@ class RAGGuard:
         self,
         text: str,
         index: int,
-        all_texts: List[str],
+        all_texts: list[str],
         embedding,
         query_embedding,
         all_embeddings,

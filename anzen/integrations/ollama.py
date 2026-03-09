@@ -1,3 +1,5 @@
+"""Ollama integration"""
+
 import requests
 import httpx
 from typing import Any

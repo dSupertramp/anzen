@@ -1,6 +1,6 @@
 from collections import deque
 from dataclasses import dataclass, field
-from typing import List
+from typing import list
 import time
 
 
@@ -28,10 +28,7 @@ class ConversationTracker:
 
     @property
     def cumulative_risk(self) -> float:
-        return sum(
-            t.risk_score * (0.8 ** i)
-            for i, t in enumerate(reversed(self._history))
-        )
+        return sum(t.risk_score * (0.8**i) for i, t in enumerate(reversed(self._history)))
 
     @property
     def is_suspicious(self) -> bool:
@@ -48,5 +45,5 @@ class ConversationTracker:
         self._history.clear()
 
     @property
-    def history(self) -> List[TurnRecord]:
+    def history(self) -> list[TurnRecord]:
         return list(self._history)

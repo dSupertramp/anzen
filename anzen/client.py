@@ -6,12 +6,11 @@ Wraps any OpenAI-compatible client and wires up all three guards
 """
 
 import uuid
-from typing import List, Dict, Any, Union
-
+from typing import Any, dict, list
 from anzen.config import AnzenConfig
 from anzen.events import EventBus, GuardEvent, EventAction, GuardType
 from anzen.tracker import ConversationTracker
-from anzen.guards.prompt import PromptGuard, AttackCategory
+from anzen.guards.prompt import PromptGuard
 from anzen.guards.rag import RAGGuard
 from anzen.guards.tool import ToolGuard
 
@@ -119,15 +118,13 @@ class Anzen:
                 )
             )
 
-        if action == EventAction.BLOCK:
-            return False
-        return True
+        return action != EventAction.BLOCK
 
     def filter_chunks(
         self,
-        chunks: List[Union[str, Dict]],
+        chunks: list[str | dict],
         query: str | None = None,
-    ) -> List:
+    ) -> list:
         """
         Filter RAG chunks. Returns only safe chunks.
         Emits events for any anomalous chunks.
@@ -137,9 +134,7 @@ class Anzen:
         for cr in rag_result.chunk_results:
             if cr.is_blocked or cr.is_alerted or self.config.log_clean:
                 action = (
-                    EventAction.BLOCK
-                    if cr.is_blocked
-                    else (EventAction.ALERT if cr.is_alerted else EventAction.ALLOW)
+                    EventAction.BLOCK if cr.is_blocked else (EventAction.ALERT if cr.is_alerted else EventAction.ALLOW)
                 )
                 self.events.emit(
                     GuardEvent(
@@ -164,20 +159,16 @@ class Anzen:
     def check_tool(
         self,
         tool_name: str,
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ) -> bool:
         """
         Check a tool call. Returns True if safe, False if blocked.
         Emits an event to the dashboard.
         """
-        result = self.tool_guard.check(
-            tool_name, params or {}, session_id=self.session_id
-        )
+        result = self.tool_guard.check(tool_name, params or {}, session_id=self.session_id)
 
         action = (
-            EventAction.BLOCK
-            if result.is_blocked
-            else (EventAction.ALERT if result.is_alerted else EventAction.ALLOW)
+            EventAction.BLOCK if result.is_blocked else (EventAction.ALERT if result.is_alerted else EventAction.ALLOW)
         )
 
         if action != EventAction.ALLOW or self.config.log_clean:
@@ -195,11 +186,9 @@ class Anzen:
                 )
             )
 
-        if result.is_blocked:
-            return False
-        return True
+        return not result.is_blocked
 
-    def scan_mcp_tools(self, tools: List[Dict]) -> List[Dict]:
+    def scan_mcp_tools(self, tools: list[dict]) -> list[dict]:
         """
         Scan MCP tool descriptors for hidden instructions / poisoning.
         Returns list of issues (empty = clean).
@@ -221,9 +210,7 @@ class Anzen:
 
     # ─── Internal helpers ────────────────────────────────────────────────────
 
-    def _score_to_action(
-        self, score: float, block_t: float, alert_t: float
-    ) -> EventAction:
+    def _score_to_action(self, score: float, block_t: float, alert_t: float) -> EventAction:
         if score >= block_t:
             return EventAction.BLOCK
         if score >= alert_t:

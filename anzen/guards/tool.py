@@ -9,33 +9,34 @@ Detects:
   - Unicode steganography in tool descriptions (MCP attack vector)
 """
 
-import re
-import time
-import threading
-from collections import deque, defaultdict
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import List, Dict, Any, Callable, Union
 import functools
+import re
+import threading
+import time
+from collections import deque, defaultdict
+from collections.abc import Callable
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import Any, dict, list
 
 from anzen.exceptions import ToolBlockedError
 from anzen.guards.prompt import _layer1
 
 
-class ToolRiskCategory(str, Enum):
-    CLEAN          = "clean"
-    BLOCKED_TOOL   = "blocked_tool"
-    UNKNOWN_TOOL   = "unknown_tool"
-    PARAM_INJECTION= "param_injection"
-    RATE_LIMIT     = "rate_limit"
+class ToolRiskCategory(StrEnum):
+    CLEAN = "clean"
+    BLOCKED_TOOL = "blocked_tool"
+    UNKNOWN_TOOL = "unknown_tool"
+    PARAM_INJECTION = "param_injection"
+    RATE_LIMIT = "rate_limit"
     SEQUENCE_ABUSE = "sequence_abuse"
-    MCP_POISONING  = "mcp_poisoning"
+    MCP_POISONING = "mcp_poisoning"
 
 
 @dataclass
 class ToolCallResult:
     tool_name: str
-    params: Dict[str, Any]
+    params: dict[str, Any]
     risk_score: float
     category: ToolRiskCategory
     explanation: str
@@ -46,9 +47,7 @@ class ToolCallResult:
 
 # ─── Dangerous parameter patterns ────────────────────────────────────────────
 
-_PATH_TRAVERSAL = re.compile(
-    r"\.\./|\.\.\\|%2e%2e|%252e|~/|/etc/passwd|/etc/shadow|C:\\Windows\\"
-)
+_PATH_TRAVERSAL = re.compile(r"\.\./|\.\.\\|%2e%2e|%252e|~/|/etc/passwd|/etc/shadow|C:\\Windows\\")
 _SHELL_INJECTION = re.compile(
     r"(;|\||\|\||&&|\$\(|`|>\s*/|<\s*/proc|nc\s+-|curl\s+http|wget\s+http|"
     r"python\s+-c|bash\s+-c|sh\s+-c|eval\s*\(|exec\s*\(|os\.system|subprocess|__import__)"
@@ -64,14 +63,12 @@ _EXFIL_PATTERNS = re.compile(
 )
 
 # Unicode steganography (MCP tool description poisoning)
-_UNICODE_HIDDEN = re.compile(
-    r"[\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff\U000e0000-\U000e007f]"
-)
+_UNICODE_HIDDEN = re.compile(r"[\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff\U000e0000-\U000e007f]")
 
 # Suspicious call sequences — (tool_a, tool_b) = high risk if called in order
 _SUSPICIOUS_SEQUENCES = [
     ({"read_file", "list_files", "list_dir"}, {"write_file", "http_request", "send_email"}),
-    ({"get_user_data", "search", "query_db"},  {"exfiltrate", "http_post", "send_webhook"}),
+    ({"get_user_data", "search", "query_db"}, {"exfiltrate", "http_post", "send_webhook"}),
 ]
 
 
@@ -100,33 +97,33 @@ class ToolGuard:
 
     def __init__(
         self,
-        allowed_tools: List[str] | None = None,
-        blocked_tools: List[str] | None = None,
-        sensitive_params: Dict[str, List[str]] | None = None,
+        allowed_tools: list[str] | None = None,
+        blocked_tools: list[str] | None = None,
+        sensitive_params: dict[str, list[str]] | None = None,
         block_unknown: bool = False,
-        rate_limit: int = 30,           # max calls per minute per session
+        rate_limit: int = 30,  # max calls per minute per session
         block_threshold: float = 0.85,
         alert_threshold: float = 0.45,
     ):
-        self.allowed_tools    = set(allowed_tools) if allowed_tools else None
-        self.blocked_tools    = set(blocked_tools or [])
+        self.allowed_tools = set(allowed_tools) if allowed_tools else None
+        self.blocked_tools = set(blocked_tools or [])
         self.sensitive_params = sensitive_params or {}
-        self.block_unknown    = block_unknown
-        self.rate_limit       = rate_limit
-        self.block_threshold  = block_threshold
-        self.alert_threshold  = alert_threshold
+        self.block_unknown = block_unknown
+        self.rate_limit = rate_limit
+        self.block_threshold = block_threshold
+        self.alert_threshold = alert_threshold
 
         # Per-session call history for rate limiting and sequence detection
         self._lock = threading.Lock()
-        self._call_times: Dict[str, deque] = defaultdict(lambda: deque(maxlen=200))
-        self._call_history: Dict[str, deque] = defaultdict(lambda: deque(maxlen=20))
+        self._call_times: dict[str, deque] = defaultdict(lambda: deque(maxlen=200))
+        self._call_history: dict[str, deque] = defaultdict(lambda: deque(maxlen=20))
 
     # ─── Main check ──────────────────────────────────────────────────────────
 
     def check(
         self,
         tool_name: str,
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
         session_id: str = "default",
     ) -> ToolCallResult:
         t0 = time.perf_counter()
@@ -193,7 +190,7 @@ class ToolGuard:
 
     # ─── MCP tool descriptor scan ────────────────────────────────────────────
 
-    def scan_mcp_tools(self, tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def scan_mcp_tools(self, tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         Scans MCP tool descriptors for hidden instructions.
         Returns a list of issues found: [{tool, field, issue, snippet}]
@@ -213,21 +210,25 @@ class ToolGuard:
 
                 # Unicode steganography
                 if _UNICODE_HIDDEN.search(text):
-                    issues.append({
-                        "tool": name,
-                        "field": field_name,
-                        "issue": "hidden unicode instructions (possible MCP poisoning)",
-                        "snippet": repr(text[:100]),
-                    })
+                    issues.append(
+                        {
+                            "tool": name,
+                            "field": field_name,
+                            "issue": "hidden unicode instructions (possible MCP poisoning)",
+                            "snippet": repr(text[:100]),
+                        }
+                    )
 
                 l1 = _layer1(text)
                 if l1 and l1.risk_score > 0.70:
-                    issues.append({
-                        "tool": name,
-                        "field": field_name,
-                        "issue": f"injection pattern in tool description: {l1.explanation}",
-                        "snippet": text[:120],
-                    })
+                    issues.append(
+                        {
+                            "tool": name,
+                            "field": field_name,
+                            "issue": f"injection pattern in tool description: {l1.explanation}",
+                            "snippet": text[:120],
+                        }
+                    )
 
         return issues
 
@@ -242,6 +243,7 @@ class ToolGuard:
 
         The decorated function must accept (tool_name, params) as first two args.
         """
+
         def decorator(f):
             @functools.wraps(f)
             def wrapper(tool_name, params=None, *args, **kwargs):
@@ -256,6 +258,7 @@ class ToolGuard:
                         category=result.category.value,
                     )
                 return f(tool_name, params, *args, **kwargs)
+
             return wrapper
 
         if fn is not None:
@@ -264,7 +267,7 @@ class ToolGuard:
 
     # ─── Internals ───────────────────────────────────────────────────────────
 
-    def _check_params(self, tool_name: str, params: Dict) -> tuple:
+    def _check_params(self, tool_name: str, params: dict) -> tuple:
         """Returns (risk_score, explanation)"""
         all_values = self._flatten_params(params)
         sensitive_keys = self.sensitive_params.get(tool_name, [])
@@ -320,11 +323,11 @@ class ToolGuard:
         recent_set = set(history[-5:])
         for read_tools, write_tools in _SUSPICIOUS_SEQUENCES:
             if history[-1] in write_tools and recent_set & read_tools:
-                return 0.70, f"suspicious sequence: read then exfiltrate pattern"
+                return 0.70, "suspicious sequence: read then exfiltrate pattern"
 
         return 0.0, ""
 
-    def _flatten_params(self, params: Dict) -> List[str]:
+    def _flatten_params(self, params: dict) -> list[str]:
         values = []
         for v in params.values():
             if isinstance(v, str):

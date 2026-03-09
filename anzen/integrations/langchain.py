@@ -20,7 +20,7 @@ Usage:
     safe_docs = callback.filter_documents(docs, query=query)
 """
 
-from typing import Any, Dict, List, Union
+from typing import Any, dict, list
 from uuid import UUID
 
 from anzen.client import Anzen
@@ -58,8 +58,8 @@ class AnzenCallback:
 
     def on_llm_start(
         self,
-        serialized: Dict[str, Any],
-        prompts: List[str],
+        serialized: dict[str, Any],
+        prompts: list[str],
         *,
         run_id: UUID,
         **kwargs: Any,
@@ -72,8 +72,8 @@ class AnzenCallback:
 
     def on_chat_model_start(
         self,
-        serialized: Dict[str, Any],
-        messages: List[List[Any]],
+        serialized: dict[str, Any],
+        messages: list[list[Any]],
         *,
         run_id: UUID,
         **kwargs: Any,
@@ -89,7 +89,7 @@ class AnzenCallback:
 
     def on_tool_start(
         self,
-        serialized: Dict[str, Any],
+        serialized: dict[str, Any],
         input_str: str,
         *,
         run_id: UUID,
@@ -119,12 +119,10 @@ class AnzenCallback:
     def on_llm_error(self, error: Exception, *, run_id: UUID, **kwargs: Any) -> None:
         pass
 
-    def on_chain_start(
-        self, serialized: Dict, inputs: Dict, *, run_id: UUID, **kwargs
-    ) -> None:
+    def on_chain_start(self, serialized: dict, inputs: dict, *, run_id: UUID, **kwargs) -> None:
         pass
 
-    def on_chain_end(self, outputs: Dict, *, run_id: UUID, **kwargs) -> None:
+    def on_chain_end(self, outputs: dict, *, run_id: UUID, **kwargs) -> None:
         pass
 
     def on_chain_error(self, error: Exception, *, run_id: UUID, **kwargs) -> None:
@@ -136,16 +134,16 @@ class AnzenCallback:
     def on_agent_finish(self, finish: Any, *, run_id: UUID, **kwargs) -> None:
         pass
 
-    def on_retriever_end(self, documents: List, *, run_id: UUID, **kwargs) -> None:
+    def on_retriever_end(self, documents: list, *, run_id: UUID, **kwargs) -> None:
         pass
 
     # ─── RAG helper ──────────────────────────────────────────────────────────
 
     def filter_documents(
         self,
-        documents: List,
+        documents: list,
         query: str | None = None,
-    ) -> List:
+    ) -> list:
         """
         Filter LangChain Document objects through RAGGuard.
         Call this after retrieval, before passing docs to the LLM.
