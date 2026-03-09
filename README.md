@@ -20,16 +20,7 @@ pip install anzen
 
 > *`anzen monitor`*
 
-Commercial alternatives (Lakera, Lasso, Protect AI) are closed source, SaaS-only, and route your prompts through their servers. For teams in regulated industries, or any team that doesn't want to trust a black box with their users' data there's been no real alternative.
-
-| | Lakera / Lasso | **Anzen** |
-|---|---|---|
-| Pricing | $$$, quote-based | **Free, forever** |
-| Source | Closed | **Apache 2.0** |
-| Deployment | SaaS only | **Self-host, one command** |
-| Your prompts | Their servers | **Never leaves yours** |
-| Scope | Prompt injection | **Full agentic stack** |
-
+Tons of existing tools, but closed-source, expensive and not easy to use.
 ---
 
 ## Supported providers
