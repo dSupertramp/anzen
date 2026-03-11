@@ -20,7 +20,7 @@ pip install anzen
 
 > *`anzen monitor`*
 
-Tons of existing tools, but closed-source, expensive and not easy to use.
+Tons of existing tools, but closed-source, expensive and not easy to use
 ---
 
 ## Supported providers

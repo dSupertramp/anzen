@@ -44,7 +44,7 @@ npm install
 npm run dev
 ```
 
-The backend for the dashboard lives in `anzen/server` and runs via `anzen monitor`.
+The frontend for the dashboard lives in `ui/frontend` and runs via `anzen monitor`.
 
 ## Pull Request guidelines
 
