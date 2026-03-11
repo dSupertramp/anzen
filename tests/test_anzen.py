@@ -1,20 +1,21 @@
 """
-Anzen test suite.
+Anzen tests.
 Run: pytest tests/ -v
 """
 
 import time
 
 import pytest
-from anzen.guards.prompt import PromptGuard, AttackCategory
-from anzen.guards.rag import RAGGuard
-from anzen.guards.tool import ToolGuard, ToolBlockedError
-from anzen.tracker import ConversationTracker
-from anzen.config import AnzenConfig
+
 from anzen.client import Anzen
+from anzen.config import AnzenConfig
+from anzen.guards.prompt import AttackCategory, PromptGuard
+from anzen.guards.rag import RAGGuard
+from anzen.guards.tool import ToolBlockedError, ToolGuard
+from anzen.tracker import ConversationTracker
 
+# PromptGuard tests
 
-# ─── PromptGuard tests ───────────────────────────────────────────────────────
 
 class TestPromptGuard:
     def setup_method(self):
@@ -66,7 +67,8 @@ class TestPromptGuard:
         assert r.latency_ms >= 0
 
 
-# ─── ConversationTracker tests ───────────────────────────────────────────────
+# ConversationTracker tests
+
 
 class TestConversationTracker:
     def test_cumulative_risk_increases(self):
@@ -103,7 +105,8 @@ class TestConversationTracker:
         assert len(tracker.history) == 3
 
 
-# ─── RAGGuard tests ──────────────────────────────────────────────────────────
+# RAGGuard tests
+
 
 class TestRAGGuard:
     def setup_method(self):
@@ -150,7 +153,8 @@ class TestRAGGuard:
         assert not cr.is_blocked
 
 
-# ─── ToolGuard tests ─────────────────────────────────────────────────────────
+# ToolGuard tests
+
 
 class TestToolGuard:
     def setup_method(self):
@@ -226,7 +230,8 @@ class TestToolGuard:
         assert len(issues) > 0
 
 
-# ─── Anzen integration tests ───────────────────────────────────────────
+# Anzen integration tests
+
 
 class TestAnzen:
     def setup_method(self):
@@ -257,7 +262,7 @@ class TestAnzen:
             config=AnzenConfig(
                 tool_blocked_list=["bash"],
                 use_ml_classifier=False,
-            )
+            ),
         )
         assert agent.check_tool("bash", {"command": "ls"}) is False
 

@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from typing import TYPE_CHECKING
+
 from transformers import pipeline as hf_pipeline
 
 _root = Path(__file__).resolve().parent.parent.parent
@@ -36,8 +36,7 @@ class PromptResult:
     is_alerted: bool = False
 
 
-# ─── Layer 1 patterns ────────────────────────────────────────────────────────
-
+# Layer 1 patterns
 _INJECTION = [
     (
         r"\bignore\s+(all\s+)?(previous|above|prior|your)\s+(instructions?|rules?|guidelines?|prompt)\b",
@@ -238,11 +237,7 @@ def _layer2(text: str) -> PromptResult:
 
     # Preprocess: normalize, then take first 256 + last 256 chars (captures start/end injection)
     preprocessed = _normalize(text)
-    preprocessed = (
-        preprocessed[:256] + " " + preprocessed[-256:]
-        if len(preprocessed) > 512
-        else preprocessed[:512]
-    )
+    preprocessed = preprocessed[:256] + " " + preprocessed[-256:] if len(preprocessed) > 512 else preprocessed[:512]
 
     result = pipe(preprocessed, _LABELS, multi_label=False)
     top_label = result["labels"][0]

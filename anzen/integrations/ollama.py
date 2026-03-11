@@ -1,8 +1,10 @@
 """Ollama integration"""
 
-import requests
-import httpx
 from typing import Any
+
+import httpx
+import requests
+
 from anzen.client import wrap as _wrap
 from anzen.config import AnzenConfig
 from anzen.integrations._base import BaseAdapter, BaseCompletions, messages_to_prompt

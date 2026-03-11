@@ -2,11 +2,12 @@ import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-import numpy as np
-from typing import list, dict, Any, Union
-from sentence_transformers import SentenceTransformer
-from anzen.guards.prompt import _layer1 as prompt_layer1
+from typing import Any
 
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+from anzen.guards.prompt import _layer1 as prompt_layer1
 
 _root = Path(__file__).resolve().parent.parent.parent
 _ml_cache = _root / "ml"
@@ -85,7 +86,7 @@ class RAGGuard:
 
     def scan(
         self,
-        chunks: list[Union[str, dict]],
+        chunks: list[str | dict],
         query: str | None = None,
     ) -> RAGResult:
         """
@@ -121,7 +122,7 @@ class RAGGuard:
             latency_ms=(time.perf_counter() - t0) * 1000,
         )
 
-    def scan_chunk(self, chunk: Union[str, dict], query: str | None = None) -> ChunkResult:
+    def scan_chunk(self, chunk: str | dict, query: str | None = None) -> ChunkResult:
         """Scan a single chunk."""
         result = self.scan([chunk], query=query)
         return result.chunk_results[0]

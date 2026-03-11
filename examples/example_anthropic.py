@@ -3,14 +3,17 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+import anthropic
 from dotenv import load_dotenv
+
+from anzen import AnzenConfig
+from anzen.integrations import extract_text, wrap_anthropic
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 
 load_dotenv()
 
-import anthropic
-from anzen.integrations import wrap_anthropic, extract_text
-from anzen import AnzenConfig
 
 SESSION_ID = os.getenv("ANZEN_SESSION_ID", "anthropic-demo")
 

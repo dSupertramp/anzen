@@ -3,14 +3,17 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from dotenv import load_dotenv
+from google import genai
+
+from anzen import AnzenConfig
+from anzen.integrations import extract_text, wrap_gemini
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 
 load_dotenv()
 
-from google import genai
-from anzen.integrations import wrap_gemini, extract_text
-from anzen import AnzenConfig
 
 SESSION_ID = os.getenv("ANZEN_SESSION_ID", "gemini-demo")
 

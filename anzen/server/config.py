@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,14 +14,14 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Auth
-    api_key: str = ""                    # Empty = no auth (dev mode)
+    api_key: str = ""  # Empty = no auth (dev mode)
     api_key_header: str = "X-Api-Key"
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./anzen.db"
 
     # CORS
-    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # Retention
     events_max_age_days: int = 30

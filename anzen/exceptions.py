@@ -4,6 +4,7 @@ Anzen exceptions.
 Raised when raise_on_block=True and a request is blocked by a guard.
 """
 
+
 class AnzenError(Exception):
     """Base exception for all Anzen errors."""
 

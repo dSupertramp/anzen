@@ -12,7 +12,7 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from queue import Empty, Queue
-from typing import Any, dict
+from typing import Any
 
 
 class EventAction(StrEnum):

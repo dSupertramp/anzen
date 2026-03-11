@@ -6,7 +6,7 @@ Broadcasts new events to all connected dashboard clients in real-time.
 import asyncio
 import json
 import logging
-from typing import Set
+
 from fastapi import WebSocket
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class ConnectionManager:
     def __init__(self):
-        self._connections: Set[WebSocket] = set()
+        self._connections: set[WebSocket] = set()
         self._lock = asyncio.Lock()
 
     async def connect(self, ws: WebSocket):

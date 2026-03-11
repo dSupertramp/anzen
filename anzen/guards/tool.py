@@ -1,23 +1,12 @@
-"""
-ToolGuard — monitors agent tool calls for abuse, anomalies, and policy violations.
-
-Detects:
-  - Blocked or unknown tools
-  - Dangerous parameter patterns (path traversal, shell injection, etc.)
-  - Rate limit violations (too many calls per minute)
-  - Suspicious call sequences
-  - Unicode steganography in tool descriptions (MCP attack vector)
-"""
-
 import functools
 import re
 import threading
 import time
-from collections import deque, defaultdict
+from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, dict, list
+from typing import Any
 
 from anzen.exceptions import ToolBlockedError
 from anzen.guards.prompt import _layer1
@@ -45,7 +34,7 @@ class ToolCallResult:
     latency_ms: float
 
 
-# ─── Dangerous parameter patterns ────────────────────────────────────────────
+# Dangerous parameter patterns
 
 _PATH_TRAVERSAL = re.compile(r"\.\./|\.\.\\|%2e%2e|%252e|~/|/etc/passwd|/etc/shadow|C:\\Windows\\")
 _SHELL_INJECTION = re.compile(
@@ -269,7 +258,6 @@ class ToolGuard:
 
     def _check_params(self, tool_name: str, params: dict) -> tuple:
         """Returns (risk_score, explanation)"""
-        all_values = self._flatten_params(params)
         sensitive_keys = self.sensitive_params.get(tool_name, [])
 
         for key, val in params.items():

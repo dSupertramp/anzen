@@ -23,8 +23,8 @@ except ImportError:
     CBEventType = None
 
 from anzen.client import Anzen
-from anzen.exceptions import PromptBlockedError, ToolBlockedError
 from anzen.config import AnzenConfig
+from anzen.exceptions import PromptBlockedError, ToolBlockedError
 
 
 class AnzenObserver:

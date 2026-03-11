@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from anzen.server.ws_manager import manager
 
 router = APIRouter()

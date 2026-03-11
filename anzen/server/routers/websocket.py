@@ -3,7 +3,9 @@ WebSocket /api/ws — real-time event stream to dashboard.
 """
 
 import asyncio
+
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+
 from anzen.server.ws_manager import manager
 
 router = APIRouter()

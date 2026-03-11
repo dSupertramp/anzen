@@ -1,7 +1,7 @@
 """
 Anzen Dashboard — FastAPI server.
 Receives guard events from the SDK, persists them, streams to the
-dashboard via WebSocket, and serves the pre-built frontend SPA.
+dashboard via WebSocket, and serves the pre-built frontend SPA from ui/.
 """
 
 import pathlib
@@ -12,11 +12,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
-from anzen.server.routers import events, websocket, stats, sessions, health
-from anzen.server.database import init_db
 from anzen.server.config import settings
+from anzen.server.database import init_db
+from anzen.server.routers import events, health, sessions, stats, websocket
 
-_STATIC_DIR = pathlib.Path(__file__).parent / "_static"
+# Frontend served exclusively from the repo's ui folder (Vite build: ui/frontend/dist)
+_PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
+_UI_DIR = _PROJECT_ROOT / "ui"
+_UI_STATIC = _UI_DIR / "frontend" / "dist"
 
 
 @asynccontextmanager
@@ -47,15 +50,17 @@ def create_app() -> FastAPI:
     app.include_router(stats.router, prefix="/api")
     app.include_router(sessions.router, prefix="/api")
 
-    if _STATIC_DIR.is_dir():
-        index_html = _STATIC_DIR / "index.html"
-
-        app.mount("/assets", StaticFiles(directory=_STATIC_DIR / "assets"), name="static-assets")
-        app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static-root")
+    if _UI_STATIC.is_dir():
+        index_html = _UI_STATIC / "index.html"
+        assets_dir = _UI_STATIC / "assets"
+        if assets_dir.is_dir():
+            app.mount("/assets", StaticFiles(directory=assets_dir), name="static-assets")
 
         @app.get("/{full_path:path}")
         async def spa_fallback(full_path: str):
-            file_path = _STATIC_DIR / full_path
+            file_path = (_UI_STATIC / full_path).resolve()
+            if not str(file_path).startswith(str(_UI_STATIC.resolve())):
+                return FileResponse(index_html)  # path traversal → SPA
             if file_path.is_file():
                 return FileResponse(file_path)
             return FileResponse(index_html)

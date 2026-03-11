@@ -1,18 +1,12 @@
-"""
-Anzen — main orchestrator.
-
-Wraps any OpenAI-compatible client and wires up all three guards
-(PromptGuard, RAGGuard, ToolGuard) with a shared EventBus.
-"""
-
 import uuid
-from typing import Any, dict, list
+from typing import Any
+
 from anzen.config import AnzenConfig
-from anzen.events import EventBus, GuardEvent, EventAction, GuardType
-from anzen.tracker import ConversationTracker
+from anzen.events import EventAction, EventBus, GuardEvent, GuardType
 from anzen.guards.prompt import PromptGuard
 from anzen.guards.rag import RAGGuard
 from anzen.guards.tool import ToolGuard
+from anzen.tracker import ConversationTracker
 
 
 class Anzen:

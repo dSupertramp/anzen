@@ -28,9 +28,11 @@ def cmd_monitor(args):
     url = f"http://{'localhost' if args.host == '0.0.0.0' else args.host}:{args.port}"
 
     if not args.no_open:
+
         def _open():
             time.sleep(1.5)
             webbrowser.open(url)
+
         threading.Thread(target=_open, daemon=True).start()
 
     print(f"\n  Anzen Monitor → {url}\n")

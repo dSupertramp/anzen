@@ -3,14 +3,17 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+import openai
 from dotenv import load_dotenv
+
+from anzen import AnzenConfig
+from anzen.integrations import extract_text, wrap_openai
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 
 load_dotenv()
 
-import openai
-from anzen.integrations import wrap_openai, extract_text
-from anzen import AnzenConfig
 
 SESSION_ID = os.getenv("ANZEN_SESSION_ID", "openai-demo")
 
